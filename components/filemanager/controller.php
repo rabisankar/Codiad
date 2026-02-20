@@ -6,18 +6,10 @@
     *  [root]/license.txt for more. This information must remain intact.
     */
 
-    require_once('../../common.php');
-    require_once('class.filemanager.php');
+require_once('../../common.php');
+require_once('class.filemanager.php');
 
-    //////////////////////////////////////////////////////////////////
-    // Verify Session or Key
-    //////////////////////////////////////////////////////////////////
-
-    checkSession();
-
-    //////////////////////////////////////////////////////////////////
-    // Get Action
-    //////////////////////////////////////////////////////////////////
+checkSession();
 
 if (!empty($_GET['action'])) {
     $action = $_GET['action'];
@@ -25,36 +17,20 @@ if (!empty($_GET['action'])) {
     exit('{"status":"error","data":{"error":"No Action Specified"}}');
 }
 
-    //////////////////////////////////////////////////////////////////
-    // Ensure Project Has Been Loaded
-    //////////////////////////////////////////////////////////////////
-
 if (!isset($_SESSION['project'])) {
     $_GET['action']='get_current';
     $_GET['no_return']='true';
     require_once('../project/controller.php');
 }
-    
-    //////////////////////////////////////////////////////////////////
-    // Security Check
-    //////////////////////////////////////////////////////////////////
 
 if (!checkPath($_GET['path'])) {
     die('{"status":"error","message":"Invalid Path"}');
 }
 
-    //////////////////////////////////////////////////////////////////
-    // Define Root
-    //////////////////////////////////////////////////////////////////
+$_GET['root'] = WORKSPACE;
 
-    $_GET['root'] = WORKSPACE;
-
-    //////////////////////////////////////////////////////////////////
-    // Handle Action
-    //////////////////////////////////////////////////////////////////
-
-    $Filemanager = new Filemanager($_GET, $_POST, $_FILES);
-    $Filemanager->project = @$_SESSION['project']['path'];
+$Filemanager = new Filemanager($_GET, $_POST, $_FILES);
+$Filemanager->project = @$_SESSION['project'];
 
 switch ($action) {
     case 'index':
