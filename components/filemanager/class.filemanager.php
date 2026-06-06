@@ -566,7 +566,7 @@ class Filemanager extends Common
                     $add = $this->path."/$filename";
                     if (@move_uploaded_file($tmpNames[$key], $add)) {
                         $info[] = array(
-                            "name"=>$value,
+                            "name"=>$fileName,
                             "size"=>filesize($add),
                             "url"=>$add,
                             "thumbnail_url"=>$add,
