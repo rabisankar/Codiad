@@ -570,8 +570,8 @@ class Filemanager extends Common
             }
             foreach ($fileNames as $key => $fileName) {
                 if (!empty($fileName) && isset($tmpNames[$key]) && $tmpNames[$key] !== '' && isset($uploadErrors[$key]) && (int) $uploadErrors[$key] === UPLOAD_ERR_OK && is_uploaded_file($tmpNames[$key])) {
-                    $filename = basename($fileName);
-                    if ($filename === '' || $filename === '.' || $filename === '..') {
+                    $filename = str_replace(chr(0), '', basename($fileName));
+                    if ($filename === '' || $filename === '.' || $filename === '..' || preg_match('/[\/\\\\]/', $filename)) {
                         continue;
                     }
                     $add = $this->path."/$filename";
