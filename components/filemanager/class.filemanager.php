@@ -546,6 +546,7 @@ class Filemanager extends Common
             $info = array();
             $fileNames = array();
             $tmpNames = array();
+            $uploadErrors = array();
             if (isset($_FILES['upload']['name'])) {
                 if (is_array($_FILES['upload']['name'])) {
                     $fileNames = $_FILES['upload']['name'];
@@ -560,13 +561,23 @@ class Filemanager extends Common
                     $tmpNames = array($_FILES['upload']['tmp_name']);
                 }
             }
+            if (isset($_FILES['upload']['error'])) {
+                if (is_array($_FILES['upload']['error'])) {
+                    $uploadErrors = $_FILES['upload']['error'];
+                } else {
+                    $uploadErrors = array($_FILES['upload']['error']);
+                }
+            }
             foreach ($fileNames as $key => $fileName) {
-                if (!empty($fileName) && isset($tmpNames[$key]) && $tmpNames[$key] !== '' && is_uploaded_file($tmpNames[$key])) {
-                    $filename = $fileName;
+                if (!empty($fileName) && isset($tmpNames[$key]) && $tmpNames[$key] !== '' && isset($uploadErrors[$key]) && (int) $uploadErrors[$key] === UPLOAD_ERR_OK && is_uploaded_file($tmpNames[$key])) {
+                    $filename = basename($fileName);
+                    if ($filename === '' || $filename === '.' || $filename === '..') {
+                        continue;
+                    }
                     $add = $this->path."/$filename";
                     if (move_uploaded_file($tmpNames[$key], $add)) {
                         $info[] = array(
-                            "name"=>$fileName,
+                            "name"=>$filename,
                             "size"=>filesize($add),
                             "url"=>$add,
                             "thumbnail_url"=>$add,
