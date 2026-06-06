@@ -544,12 +544,20 @@ class Filemanager extends Common
         } else {
             // Handle upload
             $info = array();
-            $uploadNames = isset($_FILES['upload']['name']) ? (array) $_FILES['upload']['name'] : array();
-            foreach ($uploadNames as $key => $value) {
+            $fileNames = array();
+            if (isset($_FILES['upload']['name'])) {
+                if (is_array($_FILES['upload']['name'])) {
+                    $fileNames = $_FILES['upload']['name'];
+                } elseif ($_FILES['upload']['name'] !== '') {
+                    $fileNames = array($_FILES['upload']['name']);
+                }
+            }
+            foreach ($fileNames as $key => $value) {
                 if (!empty($value)) {
                     $filename = $value;
                     $add = $this->path."/$filename";
-                    if (@move_uploaded_file($_FILES['upload']['tmp_name'][$key], $add)) {
+                    $tmpName = is_array($_FILES['upload']['tmp_name']) ? $_FILES['upload']['tmp_name'][$key] : $_FILES['upload']['tmp_name'];
+                    if (@move_uploaded_file($tmpName, $add)) {
                         $info[] = array(
                             "name"=>$value,
                             "size"=>filesize($add),
