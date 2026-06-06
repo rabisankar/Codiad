@@ -545,6 +545,7 @@ class Filemanager extends Common
             // Handle upload
             $info = array();
             $fileNames = array();
+            $tmpNames = array();
             if (isset($_FILES['upload']['name'])) {
                 if (is_array($_FILES['upload']['name'])) {
                     $fileNames = $_FILES['upload']['name'];
@@ -552,12 +553,18 @@ class Filemanager extends Common
                     $fileNames = array($_FILES['upload']['name']);
                 }
             }
-            foreach ($fileNames as $key => $value) {
-                if (!empty($value)) {
-                    $filename = $value;
+            if (isset($_FILES['upload']['tmp_name'])) {
+                if (is_array($_FILES['upload']['tmp_name'])) {
+                    $tmpNames = $_FILES['upload']['tmp_name'];
+                } elseif ($_FILES['upload']['tmp_name'] !== '') {
+                    $tmpNames = array($_FILES['upload']['tmp_name']);
+                }
+            }
+            foreach ($fileNames as $key => $fileName) {
+                if (!empty($fileName) && !empty($tmpNames[$key])) {
+                    $filename = $fileName;
                     $add = $this->path."/$filename";
-                    $tmpName = is_array($_FILES['upload']['tmp_name']) ? $_FILES['upload']['tmp_name'][$key] : $_FILES['upload']['tmp_name'];
-                    if (@move_uploaded_file($tmpName, $add)) {
+                    if (@move_uploaded_file($tmpNames[$key], $add)) {
                         $info[] = array(
                             "name"=>$value,
                             "size"=>filesize($add),
