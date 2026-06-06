@@ -87,11 +87,7 @@ class Filemanager extends Common
 
         foreach (array('content', 'mtime', 'patch') as $key) {
             if (!empty($post[$key])) {
-                if (get_magic_quotes_gpc()) {
-                    $this->$key = stripslashes($post[$key]);
-                } else {
-                    $this->$key = $post[$key];
-                }
+                $this->$key = $post[$key];
             }
         }
         // Duplicate
@@ -548,7 +544,7 @@ class Filemanager extends Common
         } else {
             // Handle upload
             $info = array();
-            while (list($key,$value) = each($_FILES['upload']['name'])) {
+            foreach ((array) $_FILES['upload']['name'] as $key => $value) {
                 if (!empty($value)) {
                     $filename = $value;
                     $add = $this->path."/$filename";
