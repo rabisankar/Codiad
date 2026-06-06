@@ -561,7 +561,7 @@ class Filemanager extends Common
                 }
             }
             foreach ($fileNames as $key => $fileName) {
-                if (!empty($fileName) && !empty($tmpNames[$key])) {
+                if (!empty($fileName) && isset($tmpNames[$key]) && $tmpNames[$key] !== '') {
                     $filename = $fileName;
                     $add = $this->path."/$filename";
                     if (@move_uploaded_file($tmpNames[$key], $add)) {
