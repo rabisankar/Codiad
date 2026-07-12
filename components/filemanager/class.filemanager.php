@@ -87,11 +87,7 @@ class Filemanager extends Common
 
         foreach (array('content', 'mtime', 'patch') as $key) {
             if (!empty($post[$key])) {
-                if (get_magic_quotes_gpc()) {
-                    $this->$key = stripslashes($post[$key]);
-                } else {
-                    $this->$key = $post[$key];
-                }
+                $this->$key = $post[$key];
             }
         }
         // Duplicate
@@ -548,13 +544,40 @@ class Filemanager extends Common
         } else {
             // Handle upload
             $info = array();
-            while (list($key,$value) = each($_FILES['upload']['name'])) {
-                if (!empty($value)) {
-                    $filename = $value;
+            $fileNames = array();
+            $tmpNames = array();
+            $uploadErrors = array();
+            if (isset($_FILES['upload']['name'])) {
+                if (is_array($_FILES['upload']['name'])) {
+                    $fileNames = $_FILES['upload']['name'];
+                } elseif ($_FILES['upload']['name'] !== '') {
+                    $fileNames = array($_FILES['upload']['name']);
+                }
+            }
+            if (isset($_FILES['upload']['tmp_name'])) {
+                if (is_array($_FILES['upload']['tmp_name'])) {
+                    $tmpNames = $_FILES['upload']['tmp_name'];
+                } elseif ($_FILES['upload']['tmp_name'] !== '') {
+                    $tmpNames = array($_FILES['upload']['tmp_name']);
+                }
+            }
+            if (isset($_FILES['upload']['error'])) {
+                if (is_array($_FILES['upload']['error'])) {
+                    $uploadErrors = $_FILES['upload']['error'];
+                } else {
+                    $uploadErrors = array($_FILES['upload']['error']);
+                }
+            }
+            foreach ($fileNames as $key => $fileName) {
+                if (!empty($fileName) && isset($tmpNames[$key]) && $tmpNames[$key] !== '' && isset($uploadErrors[$key]) && (int) $uploadErrors[$key] === UPLOAD_ERR_OK && is_uploaded_file($tmpNames[$key])) {
+                    $filename = str_replace(chr(0), '', basename($fileName));
+                    if ($filename === '' || $filename === '.' || $filename === '..' || preg_match('/[\/\\\\]/', $filename)) {
+                        continue;
+                    }
                     $add = $this->path."/$filename";
-                    if (@move_uploaded_file($_FILES['upload']['tmp_name'][$key], $add)) {
+                    if (move_uploaded_file($tmpNames[$key], $add)) {
                         $info[] = array(
-                            "name"=>$value,
+                            "name"=>$filename,
                             "size"=>filesize($add),
                             "url"=>$add,
                             "thumbnail_url"=>$add,

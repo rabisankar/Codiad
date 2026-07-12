@@ -39,7 +39,7 @@
   "minimum-stability": "dev",
   "require":
   {
-    "php": ">=5.2.0"
+    "php": ">=8.0.0"
   },
   "require-dev":
   {
